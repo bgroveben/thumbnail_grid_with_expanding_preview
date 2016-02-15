@@ -87,3 +87,33 @@ function initEvents() {
     }
   });
 }
+
+function showPreview( $item ) {
+  var preview = $.data( this, 'preview' ),
+  // item's offset top
+    position = $item.data( 'offsetTop' );
+  scrollExtra = 0;
+  // if a preview exists and previewPos is different (in a different row) from the item's top, then close it
+  if( typeof preview != 'undefined' ) {
+    // not in the same row
+    if(previewPos !== position ) {
+      // if position > previewPos then we need to take the current preview's height into consideration
+      // when scrolling the window
+      if (position > previewPos ) {
+        scrollExtra = preview.height;
+      }
+      hidePreview();
+    }
+    // same row
+    else {
+      preview.update( $item );
+      return false;
+    }
+  }
+  // update previewPos
+  previewPos = position;
+  // initialize new preview for the clicked item
+  preview = $.data( this, 'preview', new Preview( $item ) );
+  // expand preview overlay
+  preview.open();
+}
