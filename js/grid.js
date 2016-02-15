@@ -117,3 +117,34 @@ function showPreview( $item ) {
   // expand preview overlay
   preview.open();
 }
+
+// the preview object / overlay
+function Preview ( $item ) {
+  this.$item = $item;
+  this.expandedIdx = this.$item.index();
+  this.create();
+  this.update();
+}
+// As the Preview object is initialized we create the necessary structure where the item's details
+// will be rendered and we append it to the item:
+create : function() {
+  // create Preview structure
+  this.$title = $( '<h3></h3>' );
+  this.$description = $( '<p></p>' );
+  this.$href = $( '<a href="#">Visit Website</a>' );
+  this.$details = $( '<div class="og-details"></div' ).append( this.$title, this.$description, this.$href );
+  this.$loading = $ ( '<div class="og-loading"></div>' );
+  this.fullimage = $( '<div class="og-fullimg"></div>' ).append( this.$loading );
+  this.$closePreview = $( '<span class="og-close"></span>' );
+  this.$previewInner = $( '<div class="og-expander-inner"></div>' ).append( this.$closePreview, this.$fullimage, this.$details );
+  this.$previewEl = $( 'div class="og-expander"></div>' ).append( this.$previewInner );
+  // append preview element to the item
+  this.$item.append ( this.getEl() );
+  // set the transitions for the preview and the item
+  if( support ) {
+    this.setTransition();
+  }
+}
+
+// Then we fill the previous structure with the item´s details (stored in data attributes and the href).
+// The update function will also be used to just update the content of an existing preview.
