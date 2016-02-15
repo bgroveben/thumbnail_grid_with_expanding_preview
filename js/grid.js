@@ -30,3 +30,60 @@ var $grid = $( '#og-grid' ),
     speed : 350,
     easing : 'ease'
   };
+
+  function init( config ) {
+    // the settings...
+    settings = $.extend( true, {}, settings, config );
+    // preload all images
+    $grid.imagesLoaded( function () {
+      // save item's size and offset
+      saveItemInfo( true );
+      // get window's size
+      getWinSize();
+      // initialize some events
+      initEvents();
+    });
+  }
+
+  // saves the item's offset top and height (if saveheight is true)
+  function saveItemInfo( saveheight ) {
+    $items.each( function() {
+      var $item = $( this );
+      $item.data( 'offsetTop', $item.offset().top );
+      if( saveheight ) {
+        $item.data( 'height', $item.height() );
+      }
+    });
+  }
+
+function getWinSize() {
+  winsize = { width : $window.width(), height : $window.height() };
+}
+
+function initEvents() {
+  // when clicking an item, show the preview with the item's info and large image
+  // close the item if already expanded
+  // also close if clicking on the item's cross
+  $items.on( 'click', 'span.og-close', function() {
+    hidePreview();
+    return false;
+  }).children( 'a' ).on( 'click', function(e) {
+    var $item = $( this ).parent();
+    // check if item already opened
+    current === $item.index() ? hidePreview() : showPreview( $item );
+    return false;
+  });
+  // on window resize get the window's size again
+  // reset some values..
+  $window.on( 'debouncedresize', function() {
+    scrollExtra = 0;
+    previewPos = -1;
+    // save item's offset
+    saveItemInfo();
+    getWinsize();
+    var preview = $.data( this, 'preview' );
+    if( typeof preview != 'undefined' ) {
+      hidePreview();
+    }
+  });
+}
