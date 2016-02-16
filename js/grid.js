@@ -192,3 +192,52 @@ update : function( $item ) {
     } ).attr( 'src', eldata.largesrc );
   }
 }
+
+// As the preview opens we will want to scroll the window so that the preview is completely visible
+// and, if possible, also the item.
+open : function() {
+  setTimeout( $.proxy( function() {
+    // set the height for the preview and the item
+    this.setHeights();
+    // scroll to position the preview in the right place
+    this.positionPreview();
+  }, this ), 25 );
+}
+
+setHeights : function() {
+  var self = this,
+  onEndFn = function() {
+    if( support ) {
+      self.$item.off( transEndEventName );
+    }
+    self.$item.addClass( 'og-expanded' );
+  };
+  this.calcHeight();
+  this.$previewEl.css( 'height', this.height );
+  this.$item.css( 'height', this.itemHeight ).on( transEndEventName, onEndFn );
+  if( !support ) {
+    onEndFn.call();
+  }
+}
+calcHeight : function() {
+  var heightPreview = winsize.height - this.$item.data( 'height' ) - marginExpanded,
+    itemHeight = winsize.height;
+
+  if( heightPreview < settings.minHeight ) {
+    heightPreview = settings.minHeight;
+    itemHeight = settings.minHeight + this.$item.data( 'height' ) + marginExpanded;
+  }
+  this.height = heightPreview;
+  this.itemHeight = itemHeight;
+}
+
+positionPreview : function() {
+  // scroll page
+  // case 1: preview height + itemheight fits in window's height
+  // case 2: preview height + item height does not fit in window's height & preview height is smaller than window's height
+  // case 3: preview height + item height does not fit in window's height & preview height is bigger than window's height
+  var position = this.$item.data( 'offsetTop' ),
+    previewOffsetT = this.$previewEl.offset().top - scrollExtra,
+    scrollVal = this.height + this.$item.data( 'height' ) + marginExpanded <= winsize.height ? position : this.height < winsize.height ? previewOffsetT - ( winsize.height - this.height ) : previewOffsetT;
+  $body.animate( { scrollTop : scrollVal }, settings.speed );
+}
