@@ -148,3 +148,47 @@ create : function() {
 
 // Then we fill the previous structure with the item´s details (stored in data attributes and the href).
 // The update function will also be used to just update the content of an existing preview.
+
+update : function( $item ) {
+  // update with new item's details
+  if( $item ) {
+    this.$item = $item;
+  }
+  // if already expanded, remove class "og-expanded" form current item and add it to new item
+  if( current !== -1 ) {
+    var $currentItem = $items.eq( current );
+    $currentItem.removeClass( 'og-expanded' );
+    this.$item.addClass( 'og-expanded' );
+    // position the preview correctly
+    this.positionPreview();
+  }
+  // update current value
+  current = this$item.index();
+  // update preview's content
+  var $itemEl = this.$item.children( 'a' ),
+    eldata = {
+      href : $itemEl.attr( 'href' ),
+      largesrc : $itemEl.data( 'largesrc' ),
+      title : $itemEl.data( 'title' ),
+      description : $itemEl.data( 'description' )
+    };
+  this.$title.html( eldata.title );
+  this.$description.html( eldata.description );
+  this.$href.attr( 'href', eldata.href );
+
+  var self = this;
+  // remove the current image in the preview
+  if( typeof self.$largeImg != 'undefined' ) {
+    self.$largeImg.remove();
+  }
+  // preload large image and add it to the preview
+  // for smaller screens we don't display the large image (the last media query will hide the wrapper of the image)
+  if( self.$fullimage.is( ':visible' ) ) {
+    this.$loading.show();
+    $( '<img/>' ).load( function() {
+      self.$loading.hide();
+      self.$largeImg = $( this ).fadeIn( 350 );
+      self.$fullimage.append( self.$largeImg );
+    } ).attr( 'src', eldata.largesrc );
+  }
+}
