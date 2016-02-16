@@ -241,3 +241,30 @@ positionPreview : function() {
     scrollVal = this.height + this.$item.data( 'height' ) + marginExpanded <= winsize.height ? position : this.height < winsize.height ? previewOffsetT - ( winsize.height - this.height ) : previewOffsetT;
   $body.animate( { scrollTop : scrollVal }, settings.speed );
 }
+
+// When closing the preview we reset the heights of the preview element and the expanded item.
+// Once this is done, the preview element/structure gets removed from the DOM.
+close : function() {
+  var self = this,
+    onEndFn = function() {
+      if( support ) {
+        $( this ).off( transEndEventName );
+      }
+      self.$item.removeClass( 'og-expanded' );
+      self.$previewEl.remove();
+    };
+  seTimeout( $.proxy( function() {
+    if( typeof this.$largeImg !== 'undefined' ) {
+      this.$largeImg.fadeOut( 'fast' );
+    }
+    this.$previewEl.css( 'height', 0 );
+    // the current expanded item (might be different from this.$item)
+    var $expandedItem = $items.eq( this.expandedIdx );
+    $expandedItem.css( 'height', $expandedItem.data( 'height' ) ).on( transEndEventName, onEndFn);
+
+    if( !support ) {
+      onEndFn.call();
+    }
+  }, this ), 25 );
+  return false;
+}
