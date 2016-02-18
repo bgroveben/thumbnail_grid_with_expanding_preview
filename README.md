@@ -5,4 +5,4 @@ The master repository for this project is at https://github.com/codrops/Thumbnai
 I want to do something like this on the Veteran Ready site to search the Community Partners page,
 but I need to understand how it works first. Here goes.
 
-I am at: The JavaScript
+I am at: Finished... for now anyway.
